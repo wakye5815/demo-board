@@ -33,11 +33,13 @@ abstract class BaseResponseBuilder
      */
     public function build()
     {
-        return response()->json(
-            [
-                'status' => $this->status,
-                'content' => $this->content
-            ]
-        );
+        return response()->json($this->toArray());
+    }
+
+    public function toArray(){
+        return [
+            'status' => $this->status,
+            'content' => $this->content
+        ];
     }
 }
