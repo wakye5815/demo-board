@@ -38,7 +38,13 @@ class BoardController extends Controller
         $validator = new BoardValidator($request, 'board_id');
         if ($validator->fails()) $validator->sendFailuerResponse();
 
-        return (new SuccessResponseBuilder())
+        $board = Board::findOneById($request->get('board_id'));
+
+        return is_null($board)
+            ? (new FailuerResponseBuilder())
+            ->setSystemErrorList(['指定されたボードが見つかりませんでした。'])
+            ->build()
+            : (new SuccessResponseBuilder())
             ->setContent([
                 'board' => Board::findOneById($request->get('board_id')),
                 'comment_list' => \App\Comment::findListByBoardId($request->get('board_id'))
