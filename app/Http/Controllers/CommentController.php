@@ -7,6 +7,7 @@ use App\Comment;
 use Illuminate\Support\Facades\Auth;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
 use App\Http\Validators\CommentValidator;
+use App\Http\ResponseBuilders\FailuerResponseBuilder;
 
 class CommentController extends Controller
 {
@@ -20,7 +21,7 @@ class CommentController extends Controller
             'owner_user_id' => Auth::user()->id,
             'content' => $request->get('content')
         ]);
-        
+
         return $this->createCommonResponse($request->get('board_id'));
     }
 
@@ -30,9 +31,13 @@ class CommentController extends Controller
         if ($validator->fails()) $validator->sendFailuerResponse();
 
         $comment = Comment::find($request->get('comment_id'));
-        $comment->delete();
 
-        return $this->createCommonResponse($comment->board_id);
+        if (is_null($comment)) {
+            return $this->createNotExistsCommentResponse();
+        } else {
+            $comment->delete();
+            return $this->createCommonResponse($comment->board_id);
+        }
     }
 
     public function edit(Request $request)
@@ -41,9 +46,13 @@ class CommentController extends Controller
         if ($validator->fails()) $validator->sendFailuerResponse();
 
         $comment = Comment::find($request->get('comment_id'));
-        $comment->update(['content' => $request->get('new_content')]);
-        
-        return $this->createCommonResponse($comment->board_id);
+
+        if (is_null($comment)) {
+            return $this->createNotExistsCommentResponse();
+        } else {
+            $comment->update(['content' => $request->get('new_content')]);
+            return $this->createCommonResponse($comment->board_id);
+        }
     }
 
     public function find(Request $request)
@@ -53,7 +62,9 @@ class CommentController extends Controller
 
         $comment = Comment::findOneById($request->get('comment_id'));
 
-        return (new SuccessResponseBuilder())
+        return is_null($comment)
+            ? $this->createNotExistsCommentResponse()
+            : (new SuccessResponseBuilder())
             ->setContent(['comment' => $comment])
             ->build();
     }
@@ -62,13 +73,25 @@ class CommentController extends Controller
      * CommentControllerでは更新後のボード内のコメントリストを返却
      *
      * @param [type] $boardId
-     * @return void
+     * @return \Illuminate\Http\JsonResponse
      */
     private function createCommonResponse($boardId)
     {
         $commentList = Comment::findListByBoardId($boardId);
         return (new SuccessResponseBuilder())
             ->setContent(['comment_list' => $commentList])
+            ->build();
+    }
+
+    /**
+     * 指定コメントが存在しない場合のレスポンス
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function createNotExistsCommentResponse()
+    {
+        return (new FailuerResponseBuilder())
+            ->setSystemErrorList(['指定されたコメントが見つかりませんでした。'])
             ->build();
     }
 }
