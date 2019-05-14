@@ -11,6 +11,11 @@ use App\Http\ResponseBuilders\FailuerResponseBuilder;
 
 class CommentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function create(Request $request)
     {
         $validator = new CommentValidator($request, 'board_id', 'content');
