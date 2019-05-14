@@ -2,23 +2,17 @@
 
 namespace Tests\Feature\Board;
 
-use Tests\TestCase;
+use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
-use App\User;
 use App\Board;
 
-class CreateTest extends TestCase
+class CreateTest extends TestCaseRequireUser
 {
     use RefreshDatabase;
 
     private const BOARD_COUNT = 10;
-
-    /**
-     * @var User
-     */
-    private $user = null;
-
+    
     /**     
      * @var Collection
      */
@@ -27,7 +21,6 @@ class CreateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->user = factory(User::class, 'testUser')->create();
         $this->boardList = collect(
             factory(Board::class, $this::BOARD_COUNT)->create([
                 'owner_user_id' => $this->user->id

@@ -2,21 +2,15 @@
 
 namespace Tests\Feature\Account;
 
-use Tests\TestCase;
+use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
-use App\User;
 use App\Board;
 use App\Comment;
 
-class TopTest extends TestCase
+class TopTest extends TestCaseRequireUser
 {
     use RefreshDatabase;
-
-    /**
-     * @var User
-     */
-    private $user = null;
 
     /**
      * @var Board
@@ -33,7 +27,6 @@ class TopTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->user = factory(User::class, 'testUser')->create();
         $this->board = factory(Board::class)->create([
             'owner_user_id' => $this->user->id
         ]);

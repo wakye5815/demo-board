@@ -2,25 +2,13 @@
 
 namespace Tests\Feature\Account;
 
-use Tests\TestCase;
+use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\User;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
 
-class SigninTest extends TestCase
+class SigninTest extends TestCaseRequireUser
 {
     use RefreshDatabase;
-
-    /**
-     * @var App\User
-     */
-    private $user = null;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->user = factory(User::class, 'testUser')->create();
-    }
 
     /**
      * @test
