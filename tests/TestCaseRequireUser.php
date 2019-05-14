@@ -1,11 +1,9 @@
 <?php
 
 namespace Tests;
-
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use App\User;
 
-abstract class TestCaseRequireUser extends BaseTestCase
+abstract class TestCaseRequireUser extends TestCase
 {
     use CreatesApplication;
 
