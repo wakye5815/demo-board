@@ -27,7 +27,7 @@
 import { Vue, Component, Watch } from "vue-property-decorator";
 import { fetchBoardTop } from "../../api/board";
 import { createComment } from "../../api/comment";
-import { isSuccessResponse } from "../../api/utils";
+import { isSuccessResponse, extractErrorMessageList} from "../../api/utils";
 import { User, Board as BoardInfo, Comment } from "../../commonTypes";
 import { Route } from "vue-router";
 import CommentRow from "../../components/CommentRow.vue";
@@ -63,6 +63,9 @@ export default class Board extends Vue {
 
     if (isSuccessResponse(response)) {
       this.commentList = response.content.comment_list;
+    }else {
+      const errorMessage = extractErrorMessageList(response).join("</br>");
+      alert(errorMessage);
     }
   }
 

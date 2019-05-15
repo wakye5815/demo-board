@@ -1,19 +1,23 @@
 <template>
   <div class="frame">
     <div class="content">
-    <p>email-address</p>
-    <el-input placeholder="Please input emailaddress" v-model="email" clearable></el-input>
-    <p>password</p>
-    <el-input placeholder="Please input password" v-model="password" show-password></el-input>
-    <el-button type="primary" size="midium" @click="signin" round>Signin</el-button>
-  </div>
+      <p>email-address</p>
+      <el-input placeholder="Please input emailaddress" v-model="email" clearable></el-input>
+      <p>password</p>
+      <el-input placeholder="Please input password" v-model="password" show-password></el-input>
+      <el-button type="primary" size="midium" @click="signin" round>Signin</el-button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { signin } from "../api/account";
-import { isSuccessResponse, isFailuerResponse } from "../api/utils";
+import {
+  isSuccessResponse,
+  isFailuerResponse,
+  extractErrorMessageList
+} from "../api/utils";
 import store from "../store";
 
 @Component
@@ -34,13 +38,7 @@ export default class SigninForm extends Vue {
       this.$store.commit("loginUser", response.content.user);
       this.$router.push("/main");
     } else if (isFailuerResponse(response)) {
-      const errorMessageList =
-        typeof response.content.param_error_list != "undefined"
-          ? Object.keys(response.content.param_error_list)
-              .map(keys => (response.content.param_error_list as any)[keys])
-              .reduce((acc: string[], next: string[]) => [...acc, ...next])
-          : [];
-      this.onFail(errorMessageList);
+      this.onFail(extractErrorMessageList(response));
     }
   }
 }

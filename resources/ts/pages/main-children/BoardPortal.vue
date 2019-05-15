@@ -19,7 +19,7 @@ s<template>
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
 import { createBoard, fetchAllBoard } from "../../api/board";
-import { isSuccessResponse, isFailuerResponse } from "../../api/utils";
+import { isSuccessResponse, isFailuerResponse, extractErrorMessageList } from "../../api/utils";
 import { Board } from "../../commonTypes";
 import { Route } from "vue-router";
 import BoardInfoRow from "../../components/BoardInfoRow.vue";
@@ -43,13 +43,7 @@ export default class BoardPortal extends Vue {
     if (isSuccessResponse(response)) {
       this.boardList = response.content.all_board_list;
     } else {
-      const errorMessage =
-        typeof response.content.param_error_list != "undefined"
-          ? Object.keys(response.content.param_error_list)
-              .map(keys => (response.content.param_error_list as any)[keys])
-              .reduce((acc: string[], next: string[]) => [...acc, ...next])
-              .join("</br>")
-          : "";
+      const errorMessage = extractErrorMessageList(response).join("</br>");
       alert(errorMessage);
     }
   }

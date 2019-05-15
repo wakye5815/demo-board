@@ -9,16 +9,18 @@ class Board extends Model
 {
     protected $fillable = ['name', 'owner_user_id'];
 
+    private static $usersJoinColumns = [
+        'boards.id',
+        'boards.name',
+        'users.name as owner_name',
+        'boards.created_at',
+        'boards.updated_at'
+    ];
+
     public static function findAll()
     {
         return DB::table('boards')
-            ->select(
-                'boards.id',
-                'boards.name',
-                'users.name as owner_name',
-                'boards.created_at',
-                'boards.updated_at'
-            )
+            ->select(Board::$usersJoinColumns)
             ->join('users', 'boards.owner_user_id', '=', 'users.id')
             ->get();
     }
@@ -26,13 +28,7 @@ class Board extends Model
     public static function findOneById($id)
     {
         return DB::table('boards')
-            ->select(
-                'boards.id',
-                'boards.name',
-                'users.name as owner_name',
-                'boards.created_at',
-                'boards.updated_at'
-            )
+            ->select(Board::$usersJoinColumns)
             ->join('users', 'boards.owner_user_id', '=', 'users.id')
             ->where('boards.id', $id)
             ->first();

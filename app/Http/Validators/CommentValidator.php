@@ -36,7 +36,7 @@ class CommentValidator extends BaseValidator
                 'max' => 'コメントは最大255文字までです'
             ],
             'new_content' => [
-                'required' => 'contentは必須パラメータです',
+                'required' => 'new_contentは必須パラメータです',
                 'string' => 'コメントが文字列ではありません',
                 'max' => 'コメントは最大255文字までです'
             ],
