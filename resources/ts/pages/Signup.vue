@@ -1,7 +1,9 @@
 <template>
-  <div>
+  <div class="main">
     <signup-form :onFail="setErrorMessageList"/>
-    <p style="color:red" v-for="(msg,index) in errorMessageList" :key="index">{{msg}}</p>
+    <ul class="error-list">
+      <li style="color:red" v-for="(msg,index) in errorMessageList" :key="index">{{msg}}</li>
+    </ul>
   </div>
 </template>
 
@@ -20,4 +22,15 @@ export default class Signup extends Vue {
 </script>
 
 <style scoped>
+.main {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.error-list{
+  height: 80px;
+}
 </style>
