@@ -17,7 +17,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
 import { fetchCommentById, editComment } from "../../api/comment";
-import { isSuccessResponse } from "../../api/utils";
+import { isSuccessResponse, extractErrorMessageList } from "../../api/utils";
 import { Comment } from "../../commonTypes";
 import { Route } from "vue-router";
 import CommentRow from "../../components/CommentRow.vue";
@@ -65,13 +65,7 @@ export default class CommentEdit extends Vue {
   }
 
   onFail<T>(response: FailuerApiResponse<T>) {
-    const errorMessage =
-      typeof response.content.param_error_list != "undefined"
-        ? Object.keys(response.content.param_error_list)
-            .map(keys => (response.content.param_error_list as any)[keys])
-            .reduce((acc: string[], next: string[]) => [...acc, ...next])
-            .join("</br>")
-        : "";
+    const errorMessage = extractErrorMessageList(response).join("</br>");
     alert(errorMessage);
   }
 }

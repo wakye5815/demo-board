@@ -15,7 +15,11 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { signup } from "../api/account";
-import { isSuccessResponse, isFailuerResponse } from "../api/utils";
+import {
+  isSuccessResponse,
+  isFailuerResponse,
+  extractErrorMessageList
+} from "../api/utils";
 
 @Component
 export default class SignupForm extends Vue {
@@ -37,13 +41,7 @@ export default class SignupForm extends Vue {
       this.$store.commit("loginUser", response.content.user);
       this.$router.push("/main");
     } else if (isFailuerResponse(response)) {
-      const errorMessageList =
-        typeof response.content.param_error_list != "undefined"
-          ? Object.keys(response.content.param_error_list)
-              .map(keys => (response.content.param_error_list as any)[keys])
-              .reduce((acc: string[], next: string[]) => [...acc, ...next])
-          : [];
-      this.onFail(errorMessageList);
+      this.onFail(extractErrorMessageList(response));
     }
   }
 }
@@ -52,7 +50,7 @@ export default class SignupForm extends Vue {
 <style scoped>
 .frame {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
-  background: #fff;  
+  background: #fff;
   height: 500px;
   width: 350px;
 }
