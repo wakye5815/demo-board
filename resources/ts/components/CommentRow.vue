@@ -17,7 +17,6 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 import { isSuccessResponse, isFailuerResponse } from "../api/utils";
 import { User, Comment } from "../commonTypes";
 
-
 @Component
 export default class SignupForm extends Vue {
   @Prop({ type: Object, required: true })
@@ -33,6 +32,10 @@ export default class SignupForm extends Vue {
 .frame {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
   background: #fff;
+}
+
+.frame:hover {
+  background: rgb(0, 0, 0, 0.05);
 }
 
 .content {
