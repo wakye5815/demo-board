@@ -1,10 +1,21 @@
 import Vue from "vue";
 import Vuex from 'vuex';
+import CommentDialogModule from "./commentDialog"
+import CommentDeleteDialogModule from "./commentDeleteDialog"
 import { User } from '../commonTypes'
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+export interface rootState {
+    isLoading: boolean,
+    loginUser?: User
+}
+
+export default new Vuex.Store<rootState>({
+    modules: {
+        commentDialog: new CommentDialogModule(),
+        commentDeleteDialog: new CommentDeleteDialogModule()
+    },
     state: {
         isLoading: false,
         loginUser: undefined

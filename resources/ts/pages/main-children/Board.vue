@@ -14,24 +14,18 @@
           :key="i"
           :comment="comment"
           @click.native="displayCommentDialog(comment)"
-          :onUpdateComment="setCommentList"
         />
       </div>
     </el-main>
     <el-footer>
       <comment-input-field :sendComment="writeComment"/>
     </el-footer>
-    <comment-dialog
-      :isVisible="canDisplayCommentDialog"
-      :comment="focusedComment"
-      :onClose="onCloseCommentDialog"
-    />
+    <comment-dialog/>
   </el-container>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
-import { fetchBoardTop } from "../../api/board";
 import { createComment } from "../../api/comment";
 import { isSuccessResponse, extractErrorMessageList } from "../../api/utils";
 import { User, Board as BoardInfo, Comment } from "../../commonTypes";
@@ -39,31 +33,29 @@ import { Route } from "vue-router";
 import CommentRow from "../../components/CommentRow.vue";
 import CommentDialog from "../../components/CommentDialog.vue";
 import CommentInputField from "../../components/CommentInputField.vue";
+import store from "../../store";
+import { createBoardModule } from "../../store/board";
 
 Component.registerHooks(["beforeRouteEnter"]);
 @Component({ components: { CommentRow, CommentInputField, CommentDialog } })
 export default class Board extends Vue {
-  private board_: BoardInfo | {} = {};
-  private commentList: Comment[] = [];
-
   // comment-dialogに渡すProp
   private focusedComment!: Comment;
   private canDisplayCommentDialog = false;
 
-  get board() {
-    return this.board_ as BoardInfo;
+  beforeRouteEnter(to: Route, from: Route, next: Function) {
+    store.registerModule(to.params.boardId, createBoardModule());
+    store
+      .dispatch(`${to.params.boardId}/fetch`, to.params.boardId)
+      .then(() => next());
   }
 
-  beforeRouteEnter(to: Route, from: Route, next: Function) {
-    const boardId = parseInt(to.params.boardId);
+  get board(): BoardInfo {
+    return this.$store.state[this.$route.params.boardId].board;
+  }
 
-    fetchBoardTop({ board_id: boardId }).then(response => {
-      if (isSuccessResponse(response))
-        next((vm: any) => {
-          vm.board_ = response.content.board;
-          vm.commentList = response.content.comment_list;
-        });
-    });
+  get commentList(): Comment[] {
+    return this.$store.state[this.$route.params.boardId].commentList;
   }
 
   async writeComment(comment: string) {
@@ -73,24 +65,19 @@ export default class Board extends Vue {
     });
 
     if (isSuccessResponse(response)) {
-      this.commentList = response.content.comment_list;
+      const commentList = response.content.comment_list;
+      this.$store.commit(`${this.$route.params.boardId}/update`, commentList);
     } else {
       const errorMessage = extractErrorMessageList(response).join("</br>");
       alert(errorMessage);
     }
   }
 
-  setCommentList(commentList: Comment[]) {
-    this.commentList = commentList;
-  }
-
   displayCommentDialog(comment: Comment) {
-    this.focusedComment = comment;
-    this.canDisplayCommentDialog = true;
-  }
-
-  onCloseCommentDialog() {
-    this.canDisplayCommentDialog = false;
+    this.$store.commit("commentDialog/comment", comment);
+    this.$store.commit("commentDialog/canDisplay", true);
+    // this.focusedComment = comment;
+    // this.canDisplayCommentDialog = true;
   }
 }
 </script>
