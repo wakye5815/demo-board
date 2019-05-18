@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Comment;
+use App\ReplyComment;
 use Illuminate\Support\Facades\Auth;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
 use App\Http\Validators\CommentValidator;
@@ -72,6 +73,30 @@ class CommentController extends Controller
             : (new SuccessResponseBuilder())
             ->setContent(['comment' => $comment])
             ->build();
+    }
+
+    public function reply(Request $request)
+    {
+        $validator = new CommentValidator($request, 'content', 'to_comment_id');
+        if ($validator->fails()) $validator->sendFailuerResponse();
+
+        $toComment = Comment::findOneById($request->get('to_comment_id'));
+        if (is_null($toComment)) {
+            return $this->createNotExistsCommentResponse();
+        }
+
+        $fromComment = Comment::create([
+            'board_id' => $toComment->board_id,
+            'owner_user_id' => Auth::user()->id,
+            'content' => $request->get('content')
+        ]);
+
+        ReplyComment::create([
+            'to_comment_id' => $toComment->id,
+            'from_comment_id' => $fromComment->id
+        ]);
+
+        return $this->createCommonResponse($toComment->board_id);
     }
 
     /**
