@@ -18,7 +18,7 @@ export type Comment = {
 export type Board = {
     id: number,
     name: string,
-    owner_name: string,
+    owner_user: User,
     created_at: string,
     updated_at: string
 };

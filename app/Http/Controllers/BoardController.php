@@ -22,14 +22,14 @@ class BoardController extends Controller
         ]);
 
         return (new SuccessResponseBuilder())
-            ->setContent(['all_board_list' => Board::findAll()])
+            ->setContent(['all_board_list' => Board::findAll()->toArray()])
             ->build();
     }
 
     public function all()
     {
         return (new SuccessResponseBuilder())
-            ->setContent(['all_board_list' => Board::findAll()])
+            ->setContent(['all_board_list' => Board::findAll()->toArray()])
             ->build();
     }
 
@@ -38,7 +38,7 @@ class BoardController extends Controller
         $validator = new BoardValidator($request, 'board_id');
         if ($validator->fails()) $validator->sendFailuerResponse();
 
-        $board = Board::findOneById($request->get('board_id'));
+        $board = Board::findOneById($request->get('board_id'))->toArray();
 
         return is_null($board)
             ? (new FailuerResponseBuilder())
@@ -46,7 +46,7 @@ class BoardController extends Controller
             ->build()
             : (new SuccessResponseBuilder())
             ->setContent([
-                'board' => Board::findOneById($request->get('board_id')),
+                'board' => $board,
                 'comment_list' => \App\Comment::findListByBoardId($request->get('board_id'))
             ])
             ->build();

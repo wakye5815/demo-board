@@ -3,7 +3,7 @@
     <el-header>
       <p>
         <span style="font-size:30px;">{{board.name}}</span>
-        作成者:{{board.owner_name}}
+        作成者:{{board.owner_user.name}}
       </p>
     </el-header>
     <el-main>
@@ -39,14 +39,11 @@ import { createBoardModule } from "../../store/board";
 Component.registerHooks(["beforeRouteEnter"]);
 @Component({ components: { CommentRow, CommentInputField, CommentDialog } })
 export default class Board extends Vue {
-  // comment-dialogに渡すProp
-  private focusedComment!: Comment;
-  private canDisplayCommentDialog = false;
 
   beforeRouteEnter(to: Route, from: Route, next: Function) {
     store.registerModule(to.params.boardId, createBoardModule());
     store
-      .dispatch(`${to.params.boardId}/fetch`, to.params.boardId)
+      .dispatch(`${to.params.boardId}/initialize`, to.params.boardId)
       .then(() => next());
   }
 

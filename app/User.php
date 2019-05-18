@@ -41,6 +41,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Comment', 'owner_user_id', 'id');
     }
 
+    public function board(){
+        return $this->hasMany('App\Board', 'owner_user_id', 'id');
+    }
+
     public static function isUniqueEmail(string $email)
     {
         return DB::table('users')

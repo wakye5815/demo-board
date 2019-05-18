@@ -46,7 +46,8 @@ class TopTest extends TestCaseRequireUser
         $expectedResponse = (new SuccessResponseBuilder())
             ->setContent(['board' => [
                 'name' => $this->board->name,
-                'owner_name' => $this->user->name
+                'owner_user' => $this->user->toArray(),
+                'owner_user_id' => $this->user->id
             ]])
             ->toArray();
 
