@@ -7,6 +7,7 @@ namespace CommentApiUrl {
     export const DELETE = '/api/comment/delete';
     export const EDIT = '/api/comment/edit';
     export const FIND = '/api/comment/find';
+    export const REPLY = '/api/comment/reply';
 }
 
 
@@ -32,4 +33,9 @@ export async function editComment(params: { comment_id: number, new_content: str
 export async function fetchCommentById(params: { comment_id: number })
     : Promise<types.SuccessApiResponse<{ comment: Comment }> | types.FailuerApiResponse<{ comment_id: number }>> {
     return await httpClient.get(CommentApiUrl.FIND, params);
+}
+
+export async function replyComment(params: { to_comment_id: number, content: string })
+    : Promise<CommentApiResponse<{ to_comment_id: number, content: string }>> {
+    return await httpClient.post(CommentApiUrl.REPLY, params);
 }

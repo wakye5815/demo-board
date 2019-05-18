@@ -27,7 +27,7 @@ import { Comment } from "../commonTypes";
 import CommentRow from "./CommentRow.vue";
 import CommentInputField from "./CommentInputField.vue";
 import CommentDeleteDialog from "./CommentDeleteDialog.vue";
-import { editComment } from "../api/comment";
+import { editComment , replyComment} from "../api/comment";
 import { isSuccessResponse, extractErrorMessageList } from "../api/utils";
 import { SuccessApiResponse, FailuerApiResponse } from "../api/types";
 
@@ -84,8 +84,12 @@ export default class CommentDialog extends Vue {
   }
 
   async replyComment(comment: string) {
-    // this.processResponse(response);
-    // this.closeDialog();
+    const response = await replyComment({
+      to_comment_id: this.comment.id,
+      content: comment
+    });
+    this.processResponse(response);
+    this.closeDialog();
   }
 
   // commentAPIに対する共通処理
