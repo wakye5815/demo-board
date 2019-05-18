@@ -5,13 +5,14 @@ export type User = {
 };
 
 export type Comment = {
-    comment_id: number,
+    id: number,
     board_id: number,
     content: string,
-    owner_id: number,
-    owner_name: string,
+    owner_user: User,
     created_at: string,
     updated_at: string
+    is_reply: boolean,
+    reply_to_comment?: Comment
 };
 
 export type Board = {

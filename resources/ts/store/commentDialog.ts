@@ -3,27 +3,23 @@ import { Comment } from "../commonTypes";
 import { rootState } from '.';
 
 export interface CommentDialogState {
-    comment: Comment,
+    comment?: Comment,
     canDisplay: boolean
 }
 
 const getters = {
     isMine: (state: CommentDialogState, _: any, rootState: rootState) =>
         typeof rootState.loginUser != "undefined"
-            ? state.comment.owner_id == rootState.loginUser.id
+            ? typeof state.comment != "undefined"
+                ? state.comment.owner_user.id == rootState.loginUser.id
+                : false
             : false
+
+
 }
 
 const state: CommentDialogState = {
-    comment: {
-        comment_id: 0,
-        board_id: 0,
-        content: "",
-        owner_id: 0,
-        owner_name: "",
-        created_at: "",
-        updated_at: ""
-    },
+    comment: undefined,
     canDisplay: false
 }
 

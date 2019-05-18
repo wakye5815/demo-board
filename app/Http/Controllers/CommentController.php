@@ -65,7 +65,7 @@ class CommentController extends Controller
         $validator = new CommentValidator($request, 'comment_id');
         if ($validator->fails()) $validator->sendFailuerResponse();
 
-        $comment = Comment::findOneById($request->get('comment_id'));
+        $comment = Comment::findOneById($request->get('comment_id'))->toArray();
 
         return is_null($comment)
             ? $this->createNotExistsCommentResponse()
@@ -82,9 +82,10 @@ class CommentController extends Controller
      */
     private function createCommonResponse($boardId)
     {
-        $commentList = Comment::findListByBoardId($boardId);
         return (new SuccessResponseBuilder())
-            ->setContent(['comment_list' => $commentList])
+            ->setContent([
+                'comment_list' => Comment::findListByBoardId($boardId)->toArray()
+            ])
             ->build();
     }
 

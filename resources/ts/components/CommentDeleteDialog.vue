@@ -33,7 +33,7 @@ export default class CommentDeleteDialog extends Vue {
 
   async deleteComment() {
     const response = await deleteComment({
-      comment_id: this.comment.comment_id
+      comment_id: this.comment.id
     });
     if (isSuccessResponse(response)) {
       const commentList = response.content.comment_list;

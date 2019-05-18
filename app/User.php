@@ -37,6 +37,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function comment(){
+        return $this->hasMany('App\Comment', 'owner_user_id', 'id');
+    }
+
     public static function isUniqueEmail(string $email)
     {
         return DB::table('users')

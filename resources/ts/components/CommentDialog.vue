@@ -76,7 +76,7 @@ export default class CommentDialog extends Vue {
 
   async editComment(comment: string) {
     const response = await editComment({
-      comment_id: this.comment.comment_id,
+      comment_id: this.comment.id,
       new_content: comment
     });
     this.processResponse(response);

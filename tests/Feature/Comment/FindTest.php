@@ -43,9 +43,10 @@ class FindTest extends TestCaseRequireUser
 
         $expectedResponse = (new SuccessResponseBuilder())
             ->setContent(['comment' => [
-                'owner_name' => $this->user->name,
                 'board_id' => $this->board->id,
-                'content' => $this->comment->content
+                'content' => $this->comment->content,
+                'owner_user' => $this->user->toArray(),
+                'owner_user_id' => $this->user->id
             ]])
             ->toArray();
 

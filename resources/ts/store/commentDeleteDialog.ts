@@ -2,20 +2,12 @@ import * as Vuex from 'vuex';
 import { Comment } from "../commonTypes";
 
 export interface CommentDeleteDialogState {
-    comment: Comment,
+    comment?: Comment,
     canDisplay: boolean
 }
 
 const state: CommentDeleteDialogState = {
-    comment: {
-        comment_id: 0,
-        board_id: 0,
-        content: "",
-        owner_id: 0,
-        owner_name: "",
-        created_at: "",
-        updated_at: ""
-    },
+    comment: undefined,
     canDisplay: false
 }
 

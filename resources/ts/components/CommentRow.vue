@@ -1,7 +1,7 @@
 <template>
   <div class="frame">
     <div class="content">
-      <p>投稿者:{{comment.owner_name}} 投稿日:{{comment.updated_at}}</p>
+      <p>投稿者:{{comment.owner_user.name}} 投稿日:{{comment.updated_at}}</p>
       <div class="main">
         <p>{{comment.content}}</p>
       </div>

@@ -46,10 +46,11 @@ class EditTest extends TestCaseRequireUser
 
         $expectedResponse = (new SuccessResponseBuilder())
             ->setContent(['comment_list' => [
-                [
-                    'owner_name' => $this->user->name,
+                [                    
                     'board_id' => $this->board->id,
-                    'content' => $params['new_content']
+                    'content' => $params['new_content'],
+                    'owner_user' => $this->user->toArray(),
+                    'owner_user_id' => $this->user->id
                 ]
             ]])
             ->toArray();

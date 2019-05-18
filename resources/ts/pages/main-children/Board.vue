@@ -76,8 +76,6 @@ export default class Board extends Vue {
   displayCommentDialog(comment: Comment) {
     this.$store.commit("commentDialog/comment", comment);
     this.$store.commit("commentDialog/canDisplay", true);
-    // this.focusedComment = comment;
-    // this.canDisplayCommentDialog = true;
   }
 }
 </script>

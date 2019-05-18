@@ -36,10 +36,11 @@ class CreateTest extends TestCaseRequireUser
         ];
 
         $expectedResponse = (new SuccessResponseBuilder())
-            ->setContent(['comment_list' => [[
-                'owner_name' => $this->user->name,
+            ->setContent(['comment_list' => [[                
                 'board_id' => $this->board->id,
-                'content' => $params['content']
+                'content' => $params['content'],
+                'owner_user' => $this->user->toArray(),
+                'owner_user_id' => $this->user->id
             ]]])
             ->toArray();
 
