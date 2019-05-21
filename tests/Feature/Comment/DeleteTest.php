@@ -41,14 +41,10 @@ class DeleteTest extends TestCaseRequireUser
     {
         $params = ['comment_id' => $this->comment->id];
 
-        $expectedResponse = (new SuccessResponseBuilder())
-            ->setContent(['comment_list' => []])
-            ->toArray();
-
         $this->actingAs($this->user)
             ->deleteJson('/api/comment/delete', $params)
             ->assertStatus(200)
-            ->assertJson($expectedResponse);
+            ->assertJson((new SuccessResponseBuilder())->toArray());
 
         $this->assertTrue(Comment::all()->isEmpty());
     }

@@ -41,19 +41,10 @@ class FindTest extends TestCaseRequireUser
     {
         $params = ['comment_id' => $this->comment->id];
 
-        $expectedResponse = (new SuccessResponseBuilder())
-            ->setContent(['comment' => [
-                'board_id' => $this->board->id,
-                'content' => $this->comment->content,
-                'owner_user' => $this->user->toArray(),
-                'owner_user_id' => $this->user->id
-            ]])
-            ->toArray();
-
         $this->actingAs($this->user)
             ->json('GET', '/api/comment/find', $params)
             ->assertStatus(200)
             ->assertJsonCount(1, 'content')
-            ->assertJson($expectedResponse);
+            ->assertJson((new SuccessResponseBuilder())->toArray());
     }
 }

@@ -7,10 +7,21 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
 use App\Http\Validators\BoardValidator;
 use App\Board;
+use App\Services\CommentService;
 
 
 class BoardController extends Controller
 {
+    /**
+     * @var CommentService
+     */
+    private $commentService = null;
+
+    public function __construct(CommentService $commentService)
+    {
+        $this->commentService = $commentService;
+    }
+
     public function create(Request $request)
     {
         $validator = new BoardValidator($request, 'name');
@@ -47,7 +58,8 @@ class BoardController extends Controller
             : (new SuccessResponseBuilder())
             ->setContent([
                 'board' => $board,
-                'comment_list' => \App\Comment::findListByBoardId($request->get('board_id'))
+                'comment_list' => $this->commentService->
+                    findListByBoardId($request->get('board_id'))
             ])
             ->build();
     }

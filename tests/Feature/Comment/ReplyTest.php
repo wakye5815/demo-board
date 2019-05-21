@@ -52,22 +52,13 @@ class ReplyTest extends TestCaseRequireUser
             'content' => $this->faker->text
         ];
 
-        $expectedResponse = (new SuccessResponseBuilder())
-            ->setContent(['comment_list' => [
-                $this->comment->toArray(),
-                [
-                    'board_id' => $this->board->id,
-                    'content' => $params['content'],
-                    'owner_user' => $this->replyUser->toArray(),
-                    'owner_user_id' => $this->replyUser->id
-                ]
-            ]])
-            ->toArray();
+        $res = $this->actingAs($this->replyUser)
+            ->postJson('/api/comment/reply', $params);
 
-        $this->actingAs($this->replyUser)
-            ->postJson('/api/comment/reply', $params)
-            ->assertStatus(200)
-            ->assertJson($expectedResponse);
+        echo($res->baseResponse->__toString());
+
+        $res->assertStatus(200)
+            ->assertJson((new SuccessResponseBuilder())->toArray());
 
         $fromComment = Comment::where('owner_user_id', $this->replyUser->id)->first();
         $this->assertEquals($fromComment->board_id, $this->board->id);
@@ -75,7 +66,7 @@ class ReplyTest extends TestCaseRequireUser
         $this->assertEquals($fromComment->content, $params['content']);
 
         $replyComment = ReplyComment::first();
-        $this->assertEquals($replyComment->to_comment_id, $params['to_comment_id']);
+        $this->assertEquals($replyComment->to_comment_id, $this->comment->id);
         $this->assertEquals($replyComment->from_comment_id, $fromComment->id);
     }
 }

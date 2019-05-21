@@ -35,19 +35,10 @@ class CreateTest extends TestCaseRequireUser
             'content' => $this->faker->text
         ];
 
-        $expectedResponse = (new SuccessResponseBuilder())
-            ->setContent(['comment_list' => [[                
-                'board_id' => $this->board->id,
-                'content' => $params['content'],
-                'owner_user' => $this->user->toArray(),
-                'owner_user_id' => $this->user->id
-            ]]])
-            ->toArray();
-
-        $this->actingAs($this->user)
+            $this->actingAs($this->user)
             ->postJson('/api/comment/create', $params)
             ->assertStatus(200)
-            ->assertJson($expectedResponse);
+            ->assertJson((new SuccessResponseBuilder())->toArray());
 
         $comment = Comment::first();
         $this->assertEquals($comment->board_id, $this->board->id);

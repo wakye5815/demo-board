@@ -44,21 +44,10 @@ class EditTest extends TestCaseRequireUser
             'new_content' => $this->faker->text
         ];
 
-        $expectedResponse = (new SuccessResponseBuilder())
-            ->setContent(['comment_list' => [
-                [                    
-                    'board_id' => $this->board->id,
-                    'content' => $params['new_content'],
-                    'owner_user' => $this->user->toArray(),
-                    'owner_user_id' => $this->user->id
-                ]
-            ]])
-            ->toArray();
-
         $this->actingAs($this->user)
             ->patchJson('/api/comment/edit', $params)
             ->assertStatus(200)
-            ->assertJson($expectedResponse);
+            ->assertJson((new SuccessResponseBuilder())->toArray());
 
         $comment = Comment::first();
         $this->assertEquals($comment->board_id, $this->board->id);
