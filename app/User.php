@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'badge_id'
     ];
 
     /**
@@ -43,6 +43,10 @@ class User extends Authenticatable
 
     public function board(){
         return $this->hasMany('App\Board', 'owner_user_id', 'id');
+    }
+
+    public function badge(){
+        return $this->belongsTo('App\Badge', 'badge_id', 'badge_id');
     }
 
     public static function isUniqueEmail(string $email)
