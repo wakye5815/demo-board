@@ -31,6 +31,9 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('reply_comments');
+        Schema::dropIfExists('comments');
+        Schema::dropIfExists('boards');
         Schema::dropIfExists('users');
     }
 }

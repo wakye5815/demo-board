@@ -32,6 +32,6 @@ class ReplyCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('reply_comments');
+        
     }
 }

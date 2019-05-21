@@ -18,7 +18,7 @@ class CreateCommentsTable extends Migration
             $table->bigInteger('board_id')->unsigned();
             $table->bigInteger('owner_user_id')->unsigned();
             $table->string('content', 255);
-            $table->softDeletes('deleted_at');
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('board_id')->references('id')->on('boards');
@@ -34,6 +34,6 @@ class CreateCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('comments');
+                
     }
 }
