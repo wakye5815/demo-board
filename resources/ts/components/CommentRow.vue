@@ -1,7 +1,7 @@
 <template>
   <div class="frame">
     <div class="content">
-      <p>投稿者:{{comment.owner_user.name}} 投稿日:{{comment.updated_at}}</p>
+      <p>{{metaText}}</p>
       <div class="main">
         <p>{{comment.content}}</p>
       </div>
@@ -18,6 +18,15 @@ import { User, Comment } from "../commonTypes";
 export default class CommentRow extends Vue {
   @Prop({ type: Object, required: true })
   private comment!: Comment;
+
+  get metaText() {
+    const ownerUser = this.comment.owner_user;
+    const badgeName = this.$store.getters["badge/selectedBadgeById"](
+      ownerUser.badge_id
+    ).name;
+    const postDate = this.comment.created_at;
+    return `投稿者:${badgeName}の${ownerUser.name} 投稿日:${postDate}`;
+  }
 }
 </script>
 

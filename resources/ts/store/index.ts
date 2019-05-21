@@ -2,20 +2,26 @@ import Vue from "vue";
 import Vuex from 'vuex';
 import CommentDialogModule from "./commentDialog"
 import CommentDeleteDialogModule from "./commentDeleteDialog"
+import BadgeModule from "./badge"
 import { User } from '../commonTypes'
 
 Vue.use(Vuex);
 
-export interface rootState {
-    isLoading: boolean,
-    loginUser?: User
+const modules = {
+    commentDialog: new CommentDialogModule(),
+    commentDeleteDialog: new CommentDeleteDialogModule(),
+    badge: new BadgeModule()
 }
 
+type moduleState = Partial<{ [P in keyof typeof modules]: any }>
+
+export type rootState = {
+    isLoading: boolean,
+    loginUser?: User
+} & moduleState
+
 export default new Vuex.Store<rootState>({
-    modules: {
-        commentDialog: new CommentDialogModule(),
-        commentDeleteDialog: new CommentDeleteDialogModule()
-    },
+    modules: modules,
     state: {
         isLoading: false,
         loginUser: undefined

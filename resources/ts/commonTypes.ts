@@ -1,7 +1,8 @@
 export type User = {
     id: number,
     name: string,
-    email: string
+    email: string,
+    badge_id: number
 };
 
 export type Comment = {
@@ -23,3 +24,9 @@ export type Board = {
     created_at: string,
     updated_at: string
 };
+
+export type Badge = {
+    badge_id: number,
+    name: string,
+    description: string
+}
