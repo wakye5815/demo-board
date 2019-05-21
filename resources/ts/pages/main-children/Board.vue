@@ -8,12 +8,13 @@
     </el-header>
     <el-main>
       <div class="comment-conteiner">
-        <comment-row
+        <component
           class="comment"
           v-for="(comment, i) in commentList"
           :key="i"
+          :is="comment.is_reply ? 'reply-comment-row':'comment-row'"
           :comment="comment"
-          @click.native="displayCommentDialog(comment)"
+          @click.native="()=>{if(!comment.is_deleted){displayCommentDialog(comment)}}"
         />
       </div>
     </el-main>
@@ -31,19 +32,25 @@ import { isSuccessResponse, extractErrorMessageList } from "../../api/utils";
 import { User, Board as BoardInfo, Comment } from "../../commonTypes";
 import { Route } from "vue-router";
 import CommentRow from "../../components/CommentRow.vue";
+import ReplyCommentRow from "../../components/ReplyCommentRow.vue";
 import CommentDialog from "../../components/CommentDialog.vue";
 import CommentInputField from "../../components/CommentInputField.vue";
 import store from "../../store";
 import { createBoardModule } from "../../store/board";
 
 Component.registerHooks(["beforeRouteEnter"]);
-@Component({ components: { CommentRow, CommentInputField, CommentDialog } })
+@Component({
+  components: { CommentRow, ReplyCommentRow, CommentInputField, CommentDialog }
+})
 export default class Board extends Vue {
-
   beforeRouteEnter(to: Route, from: Route, next: Function) {
-    store.registerModule(to.params.boardId, createBoardModule());
+    const moduleName = to.params.boardId;
+    // モジュール登録済か確認
+    if (typeof (store.state as any)[moduleName] == "undefined")
+      store.registerModule(moduleName, createBoardModule());
+
     store
-      .dispatch(`${to.params.boardId}/initialize`, to.params.boardId)
+      .dispatch(`${moduleName}/initialize`, to.params.boardId)
       .then(() => next());
   }
 
@@ -62,8 +69,7 @@ export default class Board extends Vue {
     });
 
     if (isSuccessResponse(response)) {
-      const commentList = response.content.comment_list;
-      this.$store.commit(`${this.$route.params.boardId}/update`, commentList);
+      await this.$store.dispatch(`${this.$route.params.boardId}/update`);
     } else {
       const errorMessage = extractErrorMessageList(response).join("</br>");
       alert(errorMessage);
@@ -82,7 +88,17 @@ export default class Board extends Vue {
   margin-bottom: 10px;
 }
 
-.comment:hover {
-  background: rgb(0, 0, 0, 0.05);
+.comment {
+  position: relative;
+}
+
+.comment:hover::after {
+  top: 0;
+  position: absolute;
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 </style>
