@@ -12,7 +12,8 @@ export type Comment = {
     created_at: string,
     updated_at: string
     is_reply: boolean,
-    reply_to_comment?: Comment
+    is_deleted: boolean,
+    to_comment?: Comment
 };
 
 export type Board = {

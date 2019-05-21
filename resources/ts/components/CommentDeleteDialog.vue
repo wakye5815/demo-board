@@ -36,8 +36,7 @@ export default class CommentDeleteDialog extends Vue {
       comment_id: this.comment.id
     });
     if (isSuccessResponse(response)) {
-      const commentList = response.content.comment_list;
-      this.$store.commit(`${this.comment.board_id}/update`, commentList);
+      await this.$store.dispatch(`${this.comment.board_id}/update`);
     } else {
       const errorMessage = extractErrorMessageList(response).join("br");
       alert(errorMessage);

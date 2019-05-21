@@ -79,7 +79,7 @@ export default class CommentDialog extends Vue {
       comment_id: this.comment.id,
       new_content: comment
     });
-    this.processResponse(response);
+    await this.processResponse(response);
     this.closeDialog();
   }
 
@@ -88,19 +88,18 @@ export default class CommentDialog extends Vue {
       to_comment_id: this.comment.id,
       content: comment
     });
-    this.processResponse(response);
+    await this.processResponse(response);
     this.closeDialog();
   }
 
   // commentAPIに対する共通処理
-  processResponse<T, U>(
+  async processResponse<T, U>(
     response:
-      | SuccessApiResponse<T & { comment_list: Comment[] }>
+      | SuccessApiResponse<T>
       | FailuerApiResponse<U>
   ) {
-    if (isSuccessResponse(response)) {
-      const commentList = response.content.comment_list;
-      this.$store.commit(`${this.comment.board_id}/update`, commentList);
+    if (isSuccessResponse(response)){
+      await this.$store.dispatch(`${this.comment.board_id}/update`);
     } else {
       const errorMessage = extractErrorMessageList(response).join("br");
       alert(errorMessage);

@@ -15,23 +15,26 @@ const state: BoardState = {
 
 const mutations = {
     initialize(state: BoardState, payload: any) {
-        console.log(state, payload);
         state.board = payload.board;
         state.commentList = payload.comment_list;
     },
     update(state: BoardState, payload: any) {
-        console.log(state, payload);
         state.commentList = payload;
     }
 }
 
 const actions = {
-    async initialize({ state, commit }: any, payload: any) {
+    async initialize({ commit }: any, payload: any) {
         const response = await fetchBoardTop({ board_id: payload });
         if (isSuccessResponse(response)) {
-            console.log(state.board, state.commentLIst, response.content);
-            console.log(state, payload);
             commit("initialize", response.content);
+        }
+    },
+
+    async update({state, commit }: any, payload: any) {
+        const response = await fetchBoardTop({ board_id: state.board.id });
+        if (isSuccessResponse(response)) {
+            commit("update", response.content.comment_list);
         }
     }
 }
