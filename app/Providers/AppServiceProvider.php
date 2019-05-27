@@ -14,6 +14,8 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind('App\Services\CommentService');
+        $this->app->bind('App\Services\BadgeService');
+        $this->app->bind('App\Services\BoardService');
     }
 
     /**

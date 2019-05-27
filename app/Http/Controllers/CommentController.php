@@ -8,6 +8,8 @@ use App\Http\ResponseBuilders\SuccessResponseBuilder;
 use App\Http\Validators\CommentValidator;
 use App\Http\ResponseBuilders\FailuerResponseBuilder;
 use App\Services\CommentService;
+use App\Services\BadgeService;
+use App\Services\BoardService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CommentController extends Controller
@@ -17,10 +19,25 @@ class CommentController extends Controller
      */
     private $commentService = null;
 
-    public function __construct(CommentService $commentService)
-    {
+    /**
+     * @var BadgeService
+     */
+    private $badgeService = null;
+
+    /**
+     * @var BoardService
+     */
+    private $boardService = null;
+
+    public function __construct(
+        CommentService $commentService,
+        BadgeService $badgeService,
+        BoardService $boardService
+    ) {
         $this->middleware('auth');
         $this->commentService = $commentService;
+        $this->badgeService = $badgeService;
+        $this->boardService = $boardService;
     }
 
     public function create(Request $request)
@@ -33,6 +50,8 @@ class CommentController extends Controller
             Auth::user()->id,
             $request->get('content')
         );
+
+        $this->badgeService->updateUserBadgeInBoard($request->get('board_id'));
 
         return (new SuccessResponseBuilder())->build();
     }
@@ -87,11 +106,15 @@ class CommentController extends Controller
         if ($validator->fails()) $validator->sendFailuerResponse();
 
         try {
+
             $this->commentService->createReply(
                 $request->get('to_comment_id'),
                 Auth::user()->id,
                 $request->get('content')
             );
+
+            $boardId = $this->boardService->findIdByCommentId($request->get('to_comment_id'));
+            $this->badgeService->updateUserBadgeInBoard($boardId);
 
             return (new SuccessResponseBuilder())->build();
         } catch (ModelNotFoundException $e) {
