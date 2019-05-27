@@ -4,7 +4,7 @@ namespace Tests\Feature\Account;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\User;
+use App\Models\User;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
 
 class SignupTest extends TestCase

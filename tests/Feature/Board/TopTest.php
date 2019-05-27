@@ -5,8 +5,8 @@ namespace Tests\Feature\Account;
 use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
-use App\Board;
-use App\Comment;
+use App\Models\Board;
+use App\Models\Comment;
 
 class TopTest extends TestCaseRequireUser
 {
@@ -51,9 +51,8 @@ class TopTest extends TestCaseRequireUser
             ]])
             ->toArray();
 
-        $res = $this->json('GET', '/api/board/top', $params);
-        echo($res->baseResponse->__toString());
-        $res->assertStatus(200)
+        $this->json('GET', '/api/board/top', $params)
+            ->assertStatus(200)
             ->assertJson($expectedResponse)
             ->assertJsonCount($this::COMMENT_COUNT, 'content.comment_list');
     }

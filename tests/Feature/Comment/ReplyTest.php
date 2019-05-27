@@ -5,10 +5,10 @@ namespace Tests\Feature\Comment;
 use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
-use App\User;
-use App\Board;
-use App\Comment;
-use App\ReplyComment;
+use App\Models\User;
+use App\Models\Board;
+use App\Models\Comment;
+use App\Models\ReplyComment;
 
 class ReplyTest extends TestCaseRequireUser
 {
@@ -52,12 +52,9 @@ class ReplyTest extends TestCaseRequireUser
             'content' => $this->faker->text
         ];
 
-        $res = $this->actingAs($this->replyUser)
-            ->postJson('/api/comment/reply', $params);
-
-        echo($res->baseResponse->__toString());
-
-        $res->assertStatus(200)
+        $this->actingAs($this->replyUser)
+            ->postJson('/api/comment/reply', $params)
+            ->assertStatus(200)
             ->assertJson((new SuccessResponseBuilder())->toArray());
 
         $fromComment = Comment::where('owner_user_id', $this->replyUser->id)->first();

@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Validators;
 
-use App\Comment;
+use App\Models\Comment;
 
 class CommentValidator extends BaseValidator
 {

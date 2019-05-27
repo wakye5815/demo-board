@@ -5,12 +5,12 @@ namespace Tests\Feature\Account;
 use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
-use App\Board;
+use App\Models\Board;
 
 class CreateTest extends TestCaseRequireUser
 {
     use RefreshDatabase;
-    
+
     /**
      * @test
      */

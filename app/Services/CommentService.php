@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
-use App\Comment;
-use App\ReplyComment;
+use App\Models\Comment;
+use App\Models\User;
+use App\Models\UserBadge;
+use App\Models\ReplyComment;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,7 +20,7 @@ class CommentService
      * @return void
      */
     public function create($boardId, $ownerUserId, $content)
-    {
+    {        
         return Comment::create([
             'board_id' => $boardId,
             'owner_user_id' => $ownerUserId,
@@ -36,7 +38,9 @@ class CommentService
     public function delete($id)
     {
         $comment = Comment::with('to_comment_list')->findOrFail($id);
-        if ($comment->is_reply) $comment->to_comment_list()->detach();
+        if ($comment->is_reply) {
+            $comment->to_comment_list()->detach();
+        }
         $comment->delete();
     }
 
@@ -62,7 +66,9 @@ class CommentService
     public function findOneById($id)
     {
         $result = Comment::findOneById($id);
-        if (is_null($result)) throw new ModelNotFoundException();
+        if (is_null($result)) {
+            throw new ModelNotFoundException();
+        }
         return $result;
     }
 
@@ -77,7 +83,9 @@ class CommentService
     public function createReply($toCommentId, $fromOwnerUserId, $content)
     {
         $toComment = Comment::findOneById($toCommentId);
-        if (is_null($toComment)) throw new ModelNotFoundException();
+        if (is_null($toComment)) {
+            throw new ModelNotFoundException();
+        }
 
         $fromComment = Comment::create([
             'board_id' => $toComment->board_id,

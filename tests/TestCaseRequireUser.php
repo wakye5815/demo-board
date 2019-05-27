@@ -1,7 +1,7 @@
 <?php
 
 namespace Tests;
-use App\User;
+use App\Models\User;
 
 abstract class TestCaseRequireUser extends TestCase
 {

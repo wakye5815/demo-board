@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Badge;
+use App\Models\Badge;
 
 class MasterBadgesTableSeeder extends Seeder
 {

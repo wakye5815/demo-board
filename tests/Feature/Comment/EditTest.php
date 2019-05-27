@@ -5,8 +5,8 @@ namespace Tests\Feature\Comment;
 use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
-use App\Board;
-use App\Comment;
+use App\Models\Board;
+use App\Models\Comment;
 
 class EditTest extends TestCaseRequireUser
 {

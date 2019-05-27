@@ -5,8 +5,8 @@ namespace Tests\Feature\Comment;
 use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
-use App\Board;
-use App\Comment;
+use App\Models\Board;
+use App\Models\Comment;
 
 class FindTest extends TestCaseRequireUser
 {
@@ -40,7 +40,6 @@ class FindTest extends TestCaseRequireUser
     public function 一つの任意のコメントを取得する()
     {
         $params = ['comment_id' => $this->comment->id];
-
         $this->actingAs($this->user)
             ->json('GET', '/api/comment/find', $params)
             ->assertStatus(200)
