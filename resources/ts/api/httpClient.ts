@@ -6,8 +6,6 @@ import router from "../router";
 class HttpClient {
     private axios!: AxiosInstance
     constructor() {
-        console.log("generate http client");
-        console.log(`hwader:${(window as any).Laravel.csrfToken}`);
         this.axios = Axios.create({
             headers: {
                 'X-XSRF-TOKEN': document.cookie.split(';')

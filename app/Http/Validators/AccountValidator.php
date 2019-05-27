@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Validators;
 
-use App\User;
+use App\Models\User;
 
 class AccountValidator extends BaseValidator
 {

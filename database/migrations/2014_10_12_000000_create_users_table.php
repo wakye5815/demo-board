@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestamps();            
         });
     }
 
@@ -31,6 +31,11 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('user_badges');
+        Schema::dropIfExists('reply_comments');
+        Schema::dropIfExists('comments');
+        Schema::dropIfExists('boards');        
+        Schema::dropIfExists('m_badges');
+        Schema::dropIfExists('users');        
     }
 }

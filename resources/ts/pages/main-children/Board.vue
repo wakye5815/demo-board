@@ -3,56 +3,63 @@
     <el-header>
       <p>
         <span style="font-size:30px;">{{board.name}}</span>
-        作成者:{{board.owner_name}}
+        作成者:{{board.owner_user.name}}
       </p>
-      
     </el-header>
     <el-main>
       <div class="comment-conteiner">
-        <comment-row
+        <component
+          class="comment"
           v-for="(comment, i) in commentList"
           :key="i"
+          :is="comment.is_reply ? 'reply-comment-row':'comment-row'"
           :comment="comment"
-          :onUpdateComment="setCommentList"
+          @click.native="()=>{if(!comment.is_deleted){displayCommentDialog(comment)}}"
         />
       </div>
     </el-main>
     <el-footer>
       <comment-input-field :sendComment="writeComment"/>
     </el-footer>
+    <comment-dialog/>
   </el-container>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
-import { fetchBoardTop } from "../../api/board";
 import { createComment } from "../../api/comment";
-import { isSuccessResponse, extractErrorMessageList} from "../../api/utils";
+import { isSuccessResponse, extractErrorMessageList } from "../../api/utils";
 import { User, Board as BoardInfo, Comment } from "../../commonTypes";
 import { Route } from "vue-router";
 import CommentRow from "../../components/CommentRow.vue";
+import ReplyCommentRow from "../../components/ReplyCommentRow.vue";
+import CommentDialog from "../../components/CommentDialog.vue";
 import CommentInputField from "../../components/CommentInputField.vue";
+import store from "../../store";
+import { createBoardModule } from "../../store/board";
 
 Component.registerHooks(["beforeRouteEnter"]);
-@Component({ components: { CommentRow, CommentInputField } })
+@Component({
+  components: { CommentRow, ReplyCommentRow, CommentInputField, CommentDialog }
+})
 export default class Board extends Vue {
-  private board_: BoardInfo | {} = {};
-  private commentList: Comment[] = [];
+  beforeRouteEnter(to: Route, from: Route, next: Function) {
+    const moduleName = to.params.boardId;
+    // モジュール登録済か確認
+    if (typeof (store.state as any)[moduleName] == "undefined")
+      store.registerModule(moduleName, createBoardModule());
 
-  get board() {
-    return this.board_ as BoardInfo;
+    store
+      .dispatch(`${moduleName}/initialize`, to.params.boardId)
+      .then(() => next());
   }
 
-  beforeRouteEnter(to: Route, from: Route, next: Function) {
-    const boardId = parseInt(to.params.boardId);
+  get board(): BoardInfo {
+    return this.$store.state[this.$route.params.boardId].board;
+  }
 
-    fetchBoardTop({ board_id: boardId }).then(response => {
-      if (isSuccessResponse(response))
-        next((vm: any) => {
-          vm.board_ = response.content.board;
-          vm.commentList = response.content.comment_list;
-        });
-    });
+  get commentList(): Comment[] {
+    return this.$store.state[this.$route.params.boardId].commentList;
   }
 
   async writeComment(comment: string) {
@@ -62,15 +69,16 @@ export default class Board extends Vue {
     });
 
     if (isSuccessResponse(response)) {
-      this.commentList = response.content.comment_list;
-    }else {
+      await this.$store.dispatch(`${this.$route.params.boardId}/update`);
+    } else {
       const errorMessage = extractErrorMessageList(response).join("</br>");
       alert(errorMessage);
     }
   }
 
-  setCommentList(commentList: Comment[]) {
-    this.commentList = commentList;
+  displayCommentDialog(comment: Comment) {
+    this.$store.commit("commentDialog/comment", comment);
+    this.$store.commit("commentDialog/canDisplay", true);
   }
 }
 </script>
@@ -78,5 +86,19 @@ export default class Board extends Vue {
 <style scoped>
 .comment-conteiner > div:not(:last-child) {
   margin-bottom: 10px;
+}
+
+.comment {
+  position: relative;
+}
+
+.comment:hover::after {
+  top: 0;
+  position: absolute;
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 </style>

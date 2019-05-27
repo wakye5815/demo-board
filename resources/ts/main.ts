@@ -13,10 +13,3 @@ new Vue({
   el: '#app',
   render: h => h(App)
 });
-
-console.log((window as any).Laravel.csrfToken);
-console.log(
-  document.cookie.split(';')
-    .find(cookie => cookie.split('=')[0] == 'XSRF-TOKEN')!
-    .replace(/.*=/, "")
-  );

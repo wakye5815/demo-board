@@ -35,15 +35,18 @@ Component.registerHooks(["beforeRouteEnter"]);
 
 @Component
 export default class Main extends Vue {
-  beforeRouteEnter(to: Route, from: Route, next: Function) {
-    store.getters.loginUser ? next() : next("/");
+  async beforeRouteEnter(to: Route, from: Route, next: Function) {
+    if (!store.getters.loginUser) next("/");
+    if (!store.state["badge"].isInitialized)
+      await store.dispatch("badge/initialize");
+    next();
   }
 
   get loginUser(): User {
     return this.$store.getters.loginUser;
   }
 
-  async signout(){
+  async signout() {
     await signout();
     this.$store.commit("loginUser", undefined);
     this.$router.push("/");

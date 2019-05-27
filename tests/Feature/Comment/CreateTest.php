@@ -5,8 +5,10 @@ namespace Tests\Feature\Comment;
 use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
-use App\Board;
-use App\Comment;
+use App\Models\Board;
+use App\Models\Comment;
+use Illuminate\Support\Facades\DB;
+use App\Models\UserBadge;
 
 class CreateTest extends TestCaseRequireUser
 {
@@ -30,23 +32,16 @@ class CreateTest extends TestCaseRequireUser
      */
     public function コメントを作成する()
     {
+        
         $params = [
             'board_id' => $this->board->id,
             'content' => $this->faker->text
         ];
 
-        $expectedResponse = (new SuccessResponseBuilder())
-            ->setContent(['comment_list' => [[
-                'owner_name' => $this->user->name,
-                'board_id' => $this->board->id,
-                'content' => $params['content']
-            ]]])
-            ->toArray();
-
         $this->actingAs($this->user)
             ->postJson('/api/comment/create', $params)
             ->assertStatus(200)
-            ->assertJson($expectedResponse);
+            ->assertJson((new SuccessResponseBuilder())->toArray());
 
         $comment = Comment::first();
         $this->assertEquals($comment->board_id, $this->board->id);

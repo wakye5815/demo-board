@@ -28,7 +28,7 @@ class FailuerResponseBuilder extends BaseResponseBuilder
      */
     public function setSystemErrorList(array $errorList)
     {
-        $this->content["system_errror_list"] = $errorList;
+        $this->content["system_error_list"] = $errorList;
         return $this;
     }
 }

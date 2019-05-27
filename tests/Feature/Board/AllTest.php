@@ -5,14 +5,14 @@ namespace Tests\Feature\Board;
 use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
-use App\Board;
+use App\Models\Board;
 
 class CreateTest extends TestCaseRequireUser
 {
     use RefreshDatabase;
 
     private const BOARD_COUNT = 10;
-    
+
     /**     
      * @var Collection
      */
@@ -33,8 +33,8 @@ class CreateTest extends TestCaseRequireUser
      */
     public function 登録済みの全掲示板を取得する()
     {
-        $response = $this->get('/api/board/all');
-        $response->assertStatus(200)
+        $this->get('/api/board/all')
+            ->assertStatus(200)
             ->assertJsonCount($this::BOARD_COUNT, 'content.all_board_list');
     }
 }

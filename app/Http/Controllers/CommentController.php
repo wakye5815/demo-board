@@ -3,17 +3,41 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Comment;
 use Illuminate\Support\Facades\Auth;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
 use App\Http\Validators\CommentValidator;
 use App\Http\ResponseBuilders\FailuerResponseBuilder;
+use App\Services\CommentService;
+use App\Services\BadgeService;
+use App\Services\BoardService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CommentController extends Controller
 {
-    public function __construct()
-    {
+    /**
+     * @var CommentService
+     */
+    private $commentService = null;
+
+    /**
+     * @var BadgeService
+     */
+    private $badgeService = null;
+
+    /**
+     * @var BoardService
+     */
+    private $boardService = null;
+
+    public function __construct(
+        CommentService $commentService,
+        BadgeService $badgeService,
+        BoardService $boardService
+    ) {
         $this->middleware('auth');
+        $this->commentService = $commentService;
+        $this->badgeService = $badgeService;
+        $this->boardService = $boardService;
     }
 
     public function create(Request $request)
@@ -21,13 +45,15 @@ class CommentController extends Controller
         $validator = new CommentValidator($request, 'board_id', 'content');
         if ($validator->fails()) $validator->sendFailuerResponse();
 
-        Comment::create([
-            'board_id' => $request->get('board_id'),
-            'owner_user_id' => Auth::user()->id,
-            'content' => $request->get('content')
-        ]);
+        $this->commentService->create(
+            $request->get('board_id'),
+            Auth::user()->id,
+            $request->get('content')
+        );
 
-        return $this->createCommonResponse($request->get('board_id'));
+        $this->badgeService->updateUserBadgeInBoard($request->get('board_id'));
+
+        return (new SuccessResponseBuilder())->build();
     }
 
     public function delete(Request $request)
@@ -35,13 +61,11 @@ class CommentController extends Controller
         $validator = new CommentValidator($request, 'comment_id');
         if ($validator->fails()) $validator->sendFailuerResponse();
 
-        $comment = Comment::find($request->get('comment_id'));
-
-        if (is_null($comment)) {
+        try {
+            $this->commentService->delete($request->get('comment_id'));
+            return (new SuccessResponseBuilder())->build();
+        } catch (ModelNotFoundException $e) {
             return $this->createNotExistsCommentResponse();
-        } else {
-            $comment->delete();
-            return $this->createCommonResponse($comment->board_id);
         }
     }
 
@@ -50,13 +74,11 @@ class CommentController extends Controller
         $validator = new CommentValidator($request, 'comment_id', 'new_content');
         if ($validator->fails()) $validator->sendFailuerResponse();
 
-        $comment = Comment::find($request->get('comment_id'));
-
-        if (is_null($comment)) {
+        try {
+            $this->commentService->update($request->get('comment_id'), $request->get('new_content'));
+            return (new SuccessResponseBuilder())->build();
+        } catch (ModelNotFoundException $e) {
             return $this->createNotExistsCommentResponse();
-        } else {
-            $comment->update(['content' => $request->get('new_content')]);
-            return $this->createCommonResponse($comment->board_id);
         }
     }
 
@@ -65,27 +87,39 @@ class CommentController extends Controller
         $validator = new CommentValidator($request, 'comment_id');
         if ($validator->fails()) $validator->sendFailuerResponse();
 
-        $comment = Comment::findOneById($request->get('comment_id'));
+        try {
+            $comment = $this->commentService
+                ->findOneById($request->get('comment_id'))
+                ->toArray();
 
-        return is_null($comment)
-            ? $this->createNotExistsCommentResponse()
-            : (new SuccessResponseBuilder())
-            ->setContent(['comment' => $comment])
-            ->build();
+            return (new SuccessResponseBuilder())
+                ->setContent(['comment' => $comment])
+                ->build();
+        } catch (ModelNotFoundException $e) {
+            return $this->createNotExistsCommentResponse();
+        }
     }
 
-    /**
-     * CommentControllerでは更新後のボード内のコメントリストを返却
-     *
-     * @param [type] $boardId
-     * @return \Illuminate\Http\JsonResponse
-     */
-    private function createCommonResponse($boardId)
+    public function reply(Request $request)
     {
-        $commentList = Comment::findListByBoardId($boardId);
-        return (new SuccessResponseBuilder())
-            ->setContent(['comment_list' => $commentList])
-            ->build();
+        $validator = new CommentValidator($request, 'content', 'to_comment_id');
+        if ($validator->fails()) $validator->sendFailuerResponse();
+
+        try {
+
+            $this->commentService->createReply(
+                $request->get('to_comment_id'),
+                Auth::user()->id,
+                $request->get('content')
+            );
+
+            $boardId = $this->boardService->findIdByCommentId($request->get('to_comment_id'));
+            $this->badgeService->updateUserBadgeInBoard($boardId);
+
+            return (new SuccessResponseBuilder())->build();
+        } catch (ModelNotFoundException $e) {
+            return $this->createNotExistsCommentResponse();
+        }
     }
 
     /**

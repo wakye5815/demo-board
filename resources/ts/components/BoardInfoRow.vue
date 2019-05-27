@@ -1,7 +1,7 @@
 <template>
   <div class="frame">
     <div class="content">
-      <p>{{`${board.name} 作成者:${board.owner_name}`}}</p>
+      <p>{{`${board.name} 作成者:${board.owner_user.name}`}}</p>
       <router-link :to="`board/${board.id}`">
         <el-button type="primary" size="mini" round>join</el-button>
       </router-link>

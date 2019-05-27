@@ -6,30 +6,49 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
 use App\Http\Validators\BoardValidator;
-use App\Board;
-
+use App\Services\CommentService;
+use App\Services\BoardService;
 
 class BoardController extends Controller
 {
+    /**
+     * @var CommentService
+     */
+    private $commentService = null;
+
+    /**
+     * @var BoardService
+     */
+    private $boardService = null;
+
+    public function __construct(
+        CommentService $commentService,
+        BoardService $boardService
+    ) {
+        $this->commentService = $commentService;
+        $this->boardService = $boardService;
+    }
+
     public function create(Request $request)
     {
         $validator = new BoardValidator($request, 'name');
         if ($validator->fails()) $validator->sendFailuerResponse();
 
-        Board::create([
-            'name' => $request->get('name'),
-            'owner_user_id' => Auth::user()->id
-        ]);
+        $this->boardService->create($request->get('name'), Auth::user()->id);
 
         return (new SuccessResponseBuilder())
-            ->setContent(['all_board_list' => Board::findAll()])
+            ->setContent([
+                'all_board_list' => $this->boardService->findAll()->toArray()
+            ])
             ->build();
     }
 
     public function all()
     {
         return (new SuccessResponseBuilder())
-            ->setContent(['all_board_list' => Board::findAll()])
+            ->setContent([
+                'all_board_list' => $this->boardService->findAll()->toArray()
+            ])
             ->build();
     }
 
@@ -38,17 +57,21 @@ class BoardController extends Controller
         $validator = new BoardValidator($request, 'board_id');
         if ($validator->fails()) $validator->sendFailuerResponse();
 
-        $board = Board::findOneById($request->get('board_id'));
-
-        return is_null($board)
-            ? (new FailuerResponseBuilder())
-            ->setSystemErrorList(['指定されたボードが見つかりませんでした。'])
-            ->build()
-            : (new SuccessResponseBuilder())
-            ->setContent([
-                'board' => Board::findOneById($request->get('board_id')),
-                'comment_list' => \App\Comment::findListByBoardId($request->get('board_id'))
-            ])
-            ->build();
+        try {
+            return (new SuccessResponseBuilder())
+                ->setContent([
+                    'board' => $this->boardService
+                        ->findOneById($request->get('board_id'))
+                        ->toArray(),
+                    'comment_list' => $this->commentService
+                        ->findListByBoardId($request->get('board_id'))
+                        ->toArray()
+                ])
+                ->build();
+        } catch (ModelNotFoundException $e) {
+            return (new FailuerResponseBuilder())
+                ->setSystemErrorList(['指定されたボードが見つかりませんでした。'])
+                ->build();
+        }
     }
 }

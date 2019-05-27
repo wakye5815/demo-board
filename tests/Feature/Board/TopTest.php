@@ -5,8 +5,8 @@ namespace Tests\Feature\Account;
 use Tests\TestCaseRequireUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\ResponseBuilders\SuccessResponseBuilder;
-use App\Board;
-use App\Comment;
+use App\Models\Board;
+use App\Models\Comment;
 
 class TopTest extends TestCaseRequireUser
 {
@@ -46,7 +46,8 @@ class TopTest extends TestCaseRequireUser
         $expectedResponse = (new SuccessResponseBuilder())
             ->setContent(['board' => [
                 'name' => $this->board->name,
-                'owner_name' => $this->user->name
+                'owner_user' => $this->user->toArray(),
+                'owner_user_id' => $this->user->id
             ]])
             ->toArray();
 

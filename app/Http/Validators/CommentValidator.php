@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Validators;
 
+use App\Models\Comment;
+
 class CommentValidator extends BaseValidator
 {
     protected function validatableParams()
@@ -9,7 +11,8 @@ class CommentValidator extends BaseValidator
             'board_id',
             'content',
             'new_content',
-            'comment_id'
+            'comment_id',
+            'to_comment_id'
         ]);
     }
 
@@ -19,7 +22,8 @@ class CommentValidator extends BaseValidator
             'board_id' => ['required', 'numeric'],
             'content' => ['required', 'string', 'max:255'],
             'new_content' => ['required', 'string', 'max:255'],
-            'comment_id' => ['required', 'numeric']
+            'comment_id' => ['required', 'numeric'],
+            'to_comment_id' => ['required', 'numeric']
         ]);
     }
 
@@ -43,6 +47,10 @@ class CommentValidator extends BaseValidator
             'comment_id' => [
                 'required' => 'comment_idは必須パラメータです',
                 'numeric' => 'comment_idが数値ではありません'
+            ],
+            'to_comment_id' => [
+                'required' => 'to_comment_idは必須パラメータです',
+                'numeric' => 'to_comment_idが数値ではありません'
             ]
         ]);
     }
